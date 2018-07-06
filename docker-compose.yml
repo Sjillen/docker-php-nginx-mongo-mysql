@@ -1,0 +1,75 @@
+version: '3'
+
+services:
+    web:
+        build:
+            context: ./
+            dockerfile: docker/web.docker
+        volumes:
+            - ./:/var/www
+        ports:
+            - "80:80"
+            - "443:443"
+            - "9000:9000"
+        depends_on:
+            - app
+
+    app:
+        build:
+            context: ./
+            dockerfile: docker/app.docker
+        volumes:
+            - ./:/var/www
+        hostname: localhost
+        depends_on:
+            - mysql
+            - mongo
+            - redis
+            - beanstalk
+        environment:
+            - MYSQL_HOST=mysql
+            - MYSQL_PORT=3306
+            - REDIS_PORT=6379
+            - REDIS_HOST=redis
+            - MONGO_HOST=mongo
+            - MONGO_PORT=27017
+            - BEANSTALK_HOST=beanstalk
+            - BEANSTALK_PORT=11300
+    mysql:
+        build:
+            context: ./
+            dockerfile: docker/mysql.docker
+        environment:
+            - "MYSQL_ROOT_PASSWORD=secret"
+        hostname: mysql
+        volumes:
+            - "mysql-data:/var/lib/mysql:rw"
+        ports:
+            - "3306:3306"
+
+    mongo: 
+        build:
+            context: ./
+            dockerfile: docker/mongo.docker
+        hostname: mongo
+        volumes:
+            - "mongo-data:/data/db:rw"
+        ports:
+            - "27017:27017"
+
+    redis:
+        image: redis:3.0
+        hostname: redis
+        ports:
+            - "6379:6379"
+
+    beanstalk:
+        image: schickling/beanstalkd
+        hostname: beanstalk
+        ports:
+            -  "11300:11300"
+volumes:
+    mysql-data:
+    mongo-data:
+    
+
