@@ -25,6 +25,8 @@ Go to `localhost` in your browser to open the app.
 * beanstalk host -> beanstalk
 
 
+last update: now
+
 
 
 
